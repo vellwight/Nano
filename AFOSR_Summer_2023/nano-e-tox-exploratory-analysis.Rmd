@@ -64,6 +64,55 @@ levels_unique_toxicity_values <- as.data.frame(levels(unique_toxicity_values))
 ```
 
 
+```{r}
+toxicity_ranges <- subset(nano_e_tox, grepl("-", toxicity_value))
+```
+
+
+
+```{r}
+toxicity_plus_minus <- subset(nano_e_tox, grepl("±", toxicity_value))
+```
+
+
+2. how many greater than less than (> <)
+
+```{r}
+toxicity_greater_less <- subset(nano_e_tox, grepl("[><]", toxicity_value))
+```
+
+
+4. how many confidence intervals (%)
+
+```{r}
+toxicity_confidence <- subset(nano_e_tox, grepl("[%]", toxicity_value))
+```
+
+Raw values only 
+
+```{r}
+nano_raw_toxicity_values <- subset(nano_e_tox, !grepl("\\(|±|-|>|<|≤|%", toxicity_value))
+```
+
+##trying to seprate unit and value
+```{r}
+nano_raw_toxicity_values <- nano_raw_toxicity_values %>%
+  separate(toxicity_value, into = c("value", "unit"), sep = " ", remove = FALSE)
+```
+
+```{r}
+nano_raw_toxicity_values %>% 
+  select(toxicity_value, unit, value)
+```
+###Filter numberic values where did they 7 go?
+```{r}
+nano_filter <- nano_raw_toxicity_values %>% 
+filter(str_detect(unit,"^\\s*[0-9]*\\s*$"))
+```
+
+
+
+
 **Challenge** Normalizing
 
 Seperate numeric values and units into 2 separate columns
@@ -77,11 +126,14 @@ nano_e_tox <- nano_e_tox %>%
 ```
 
 Check results
+##unclean data
 
 ```{r}
 nano_e_tox %>% 
   select(toxicity_value, value, unit)
 ```
+
+
 
 
 Define a function to convert units to mg/L
